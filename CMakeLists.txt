@@ -6,7 +6,6 @@ include_directories(fuzzy_mapping)
 include_directories(Goldwasser-Micali)
 include_directories(RBOKVS)
 include_directories(FPSI-for-Hamming)
-include_directories(BP24)
 include_directories(BLAKE3)
 
 file(GLOB_RECURSE SRCS
@@ -15,7 +14,6 @@ file(GLOB_RECURSE SRCS
     Goldwasser-Micali/*.cpp
     RBOKVS/*.cpp
     FPSI-for-Hamming/*.cpp
-    BP24/*.cpp
 )
 
 add_executable(main ${SRCS})
