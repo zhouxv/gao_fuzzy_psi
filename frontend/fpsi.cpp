@@ -8,7 +8,7 @@
 #include "fm.h"
 #include "fuzzy_mapping.h"
 #include "Hamming.h"
-#include "fpsi_bp24.h"
+// #include "fpsi_bp24.h"
 
 namespace osuCrypto
 {
