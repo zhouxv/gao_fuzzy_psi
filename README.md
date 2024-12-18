@@ -5,7 +5,7 @@ The reason is that for the convenience of implementation, it fixes many paramete
 
 ### Environment
 
-This code and following instructions is tested on Ubuntu 22.04, with g++ 11.4.0, CMake 3.22.1, and GNU Make 4.3.
+This code and following instructions are tested on Ubuntu 22.04, with g++ 11.4.0, CMake 3.22.1, and GNU Make 4.3.
 
 ### Installation of dependencies
 
