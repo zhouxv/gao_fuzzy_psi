@@ -9,7 +9,7 @@ The reason is that for the convenience of implementation, it fixes many paramete
 
 This code and following instructions are tested on Ubuntu 22.04, with `g++ 11.4.0, CMake 3.22.1, GNU Make 4.3`.
 
-## Build the code step by step
+## Build step by step
 
 ### Install dependencies
 
@@ -63,7 +63,7 @@ cmake ..
 make
 ```
 
-## Build the code with docker
+## Build with docker
 We highly suggest using this dockerfile-based approach.
 
 ```bash
