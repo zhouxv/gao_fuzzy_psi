@@ -11,7 +11,7 @@ This code and following instructions are tested on Ubuntu 22.04, with `g++ 11.4.
 
 ## Build the code step by step
 
-### Installation of dependencies
+### Install dependencies
 
 ```bash
 ##############################
