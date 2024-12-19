@@ -1,4 +1,4 @@
-# Fuzzy Privete Set Intersection from Fuzzy Mapping
+# Fuzzy Private Set Intersection from Fuzzy Mapping
 Please star this repository if it is helpful for your research.
 That is important for me.
 
@@ -42,7 +42,7 @@ cd ..
 ```
 
 ### Link pailliercryptolib
-Since we use absolute path to link pailliercryptolib, it may be helpful to check line 42 of `Fuzzy-Privete-Set-Intersection-from-Fuzzy-Mapping/CMakeLists.txt`:
+Since we use absolute path to link pailliercryptolib, it may be helpful to check line 42 of `Fuzzy-Private-Set-Intersection-from-Fuzzy-Mapping/CMakeLists.txt`:
 ```bash
 set(IPCL_DIR "/path/to/install/lib/cmake/ipcl-2.0.0/")
 ```
@@ -51,13 +51,13 @@ In the path `IPCL_DIR`, there should exists the file `IPCLConfig.cmake`.
 ### Compile FPSI
 ```bash
 ##############################
-# libOTe, pailliercryptolib, and Fuzzy-Privete-Set-Intersection-from-Fuzzy-Mapping are three parallel folders in the same path
+# libOTe, pailliercryptolib, and Fuzzy-Private-Set-Intersection-from-Fuzzy-Mapping are three parallel folders in the same path
 ##############################
-# download Fuzzy-Privete-Set-Intersection-from-Fuzzy-Mapping
-unzip Fuzzy-Privete-Set-Intersection-from-Fuzzy-Mapping.zip
-cd Fuzzy-Privete-Set-Intersection-from-Fuzzy-Mapping
+# download Fuzzy-Private-Set-Intersection-from-Fuzzy-Mapping
+unzip Fuzzy-Private-Set-Intersection-from-Fuzzy-Mapping.zip
+cd Fuzzy-Private-Set-Intersection-from-Fuzzy-Mapping
 
-# in Fuzzy-Privete-Set-Intersection-from-Fuzzy-Mapping
+# in Fuzzy-Private-Set-Intersection-from-Fuzzy-Mapping
 mkdir build && cd build
 cmake ..
 make
@@ -67,8 +67,8 @@ make
 We highly suggest using this dockerfile-based approach.
 
 ```bash
-git clone https://github.com/ql70ql70/Fuzzy-Privete-Set-Intersection-from-Fuzzy-Mapping.git
-cd Fuzzy-Privete-Set-Intersection-from-Fuzzy-Mapping
+git clone https://github.com/ql70ql70/Fuzzy-Private-Set-Intersection-from-Fuzzy-Mapping.git
+cd Fuzzy-Private-Set-Intersection-from-Fuzzy-Mapping
 docker build --no-cache -t [Your Image Name] .
 docker run -itd --net=host --name [Your Container Name] --cap-add=NET_ADMIN [Your Image ID] /bin/bash
 docker exec -it [Your Container ID] /bin/bash 

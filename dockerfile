@@ -8,7 +8,7 @@ WORKDIR /app
 
 RUN git clone https://github.com/intel/pailliercryptolib.git && \
 git clone https://github.com/osu-crypto/libOTe.git && \
-git clone https://github.com/ql70ql70/Fuzzy-Privete-Set-Intersection-from-Fuzzy-Mapping.git
+git clone https://github.com/ql70ql70/Fuzzy-Private-Set-Intersection-from-Fuzzy-Mapping.git
 
 WORKDIR /app/pailliercryptolib
 
@@ -22,11 +22,11 @@ WORKDIR /app/libOTe
 RUN python3 build.py --all --boost --sodium && \
 python3 build.py --install=./out/install/linux
 
-WORKDIR /app/Fuzzy-Privete-Set-Intersection-from-Fuzzy-Mapping
+WORKDIR /app/Fuzzy-Private-Set-Intersection-from-Fuzzy-Mapping
 
 RUN mkdir build
 
-WORKDIR /app/Fuzzy-Privete-Set-Intersection-from-Fuzzy-Mapping/build
+WORKDIR /app/Fuzzy-Private-Set-Intersection-from-Fuzzy-Mapping/build
 
 RUN cmake .. && \
 make
