@@ -83,21 +83,21 @@ docker exec -it [Your Container ID] /bin/bash
 
 ##### Run FPSI
 
-Run our FPSI for L_1 distance in a 2-dimension space with threshold of 8, sender's set size of 2^5, receiver's set size of 2^6, and intersection size of 17.
+Run our FPSI for L_1 distance in a 2-dimensional space with threshold of 8, sender's set size of 2^5, receiver's set size of 2^6, and intersection size of 17.
 
 ```bash
 # run FPSI 
 ./main -fpsi -t11 -d 2 -delta 8 -s 5 -r 6 -i 17 -p 1
 ```
 
-Run our FPSI for L_infty distance in a 3-dimension space with threshold of 4, sender's set size of 2^8, receiver's set size of 2^5, and intersection size of 7.
+Run our FPSI for L_infty distance in a 3-dimensional space with threshold of 4, sender's set size of 2^8, receiver's set size of 2^5, and intersection size of 7.
 
 ```bash
 # run FPSI 
 ./main -fpsi -t12 -d 3 -delta 4 -s 8 -r 5 -i 7
 ```
 
-Run our FPSI for Hamming distance in a 128-dimension space with threshold of 5, sender's set size of 2^6, receiver's set size of 2^6, and intersection size of 6.
+Run our FPSI for Hamming distance in a 128-dimensional space with threshold of 5, sender's set size of 2^6, receiver's set size of 2^6, and intersection size of 6.
 
 ```bash
 # run FPSI 
