@@ -1,4 +1,6 @@
 # Fuzzy Privete Set Intersection from Fuzzy Mapping
+Please star this repository if it is helpful for your research.
+That is important for me.
 
 Please note that this implementation can only be used to test the efficiency of the FPSI protocols in [[GQL+24]](https://doi.org/10.1007/978-981-96-0938-3_2) ([full version](https://eprint.iacr.org/2024/1462)) for academic purposes.
 The reason is that for the convenience of implementation, it fixes many parameters, such as secret keys, randomness and beaver triples that should be randomly generated in offline phase.
