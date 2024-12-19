@@ -7,6 +7,8 @@ The reason is that for the convenience of implementation, it fixes many paramete
 
 This code and following instructions are tested on Ubuntu 22.04, with g++ 11.4.0, CMake 3.22.1, and GNU Make 4.3.
 
+## Build the code step by step
+
 ### Installation of dependencies
 
 ```bash
@@ -59,7 +61,9 @@ cmake ..
 make
 ```
 
-### Running the code
+## Build the code with docker
+
+## Running the code
 
 ##### Print help information
 
