@@ -81,7 +81,7 @@ docker exec -it [Your Container ID] /bin/bash
 ./main
 ```
 
-##### FPSI
+##### Run FPSI
 
 Run our FPSI for L_1 distance in a 2-dimension space with threshold of 8, sender's set size of 2^5, receiver's set size of 2^6, and intersection size of 17.
 
