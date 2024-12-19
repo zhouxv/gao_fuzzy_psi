@@ -42,7 +42,7 @@ cd ..
 ```
 
 ### Link pailliercryptolib
-Since we use absolute path to link pailliercryptolib, it may be helpful to check line 42 of FPSI-from-Fmap/CMakeLists.txt:
+Since we use absolute path to link pailliercryptolib, it may be helpful to check line 42 of `Fuzzy-Privete-Set-Intersection-from-Fuzzy-Mapping/CMakeLists.txt`:
 ```bash
 set(IPCL_DIR "/path/to/install/lib/cmake/ipcl-2.0.0/")
 ```
@@ -51,13 +51,13 @@ In the path "IPCL_DIR", there should exists the file "IPCLConfig.cmake".
 ### Compile FPSI
 ```bash
 ##############################
-# libOTe, pailliercryptolib, and FPSI-from-Fmap are three parallel folders in the same path
+# libOTe, pailliercryptolib, and Fuzzy-Privete-Set-Intersection-from-Fuzzy-Mapping are three parallel folders in the same path
 ##############################
-# download FPSI-from-Fmap
-unzip FPSI-from-Fmap.zip
-cd FPSI-from-Fmap
+# download Fuzzy-Privete-Set-Intersection-from-Fuzzy-Mapping
+unzip Fuzzy-Privete-Set-Intersection-from-Fuzzy-Mapping.zip
+cd Fuzzy-Privete-Set-Intersection-from-Fuzzy-Mapping
 
-# in FPSI-from-Fmap
+# in Fuzzy-Privete-Set-Intersection-from-Fuzzy-Mapping
 mkdir build && cd build
 cmake ..
 make
