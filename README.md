@@ -63,7 +63,14 @@ make
 
 ## Build the code with docker
 
-## Running the code
+```bash
+git clone https://github.com/ql70ql70/Fuzzy-Privete-Set-Intersection-from-Fuzzy-Mapping.git
+cd Fuzzy-Privete-Set-Intersection-from-Fuzzy-Mapping
+docker build --no-cache -t [Your Image Name] .
+docker run -itd --net=host --name [Your Container Name] --cap-add=NET_ADMIN [Your Image ID] /bin/bash
+docker exec -it [Your Container ID] /bin/bash 
+```
+## Run the code
 
 ##### Print help information
 
