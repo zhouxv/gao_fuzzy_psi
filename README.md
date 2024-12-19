@@ -46,7 +46,7 @@ Since we use absolute path to link pailliercryptolib, it may be helpful to check
 ```bash
 set(IPCL_DIR "/path/to/install/lib/cmake/ipcl-2.0.0/")
 ```
-In the path "IPCL_DIR", there should exists the file "IPCLConfig.cmake".
+In the path `IPCL_DIR`, there should exists the file `IPCLConfig.cmake`.
 
 ### Compile FPSI
 ```bash
