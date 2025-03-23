@@ -1,4 +1,5 @@
 # Fuzzy Private Set Intersection from Fuzzy Mapping
+
 Please star this repository if it is helpful for your research.
 That is important for me.
 
@@ -23,7 +24,7 @@ sudo apt install libgmp-dev
 git clone https://github.com/osu-crypto/libOTe.git
 cd libOTe
 python3 build.py --all --boost --sodium
-python3 build.py --install=./out/install/linux
+python3 build.py --install=../install/
 cd ..
 
 ##############################
@@ -34,7 +35,7 @@ sudo apt-get install libssl-dev
 git clone https://github.com/intel/pailliercryptolib.git
 cd pailliercryptolib/
 export IPCL_ROOT=$(pwd)
-sudo cmake -S . -B build -DCMAKE_INSTALL_PREFIX=/path/to/install/ -DCMAKE_BUILD_TYPE=Release -DIPCL_TEST=OFF -DIPCL_BENCHMARK=OFF
+sudo cmake -S . -B build -DCMAKE_INSTALL_PREFIX=../install/ -DCMAKE_BUILD_TYPE=Release -DIPCL_TEST=OFF -DIPCL_BENCHMARK=OFF
 sudo cmake --build build -j
 sudo cmake --build build --target install -j
 cd ..
@@ -42,13 +43,17 @@ cd ..
 ```
 
 ### Link pailliercryptolib
+
 Since we use absolute path to link pailliercryptolib, it may be helpful to check line 42 of `Fuzzy-Private-Set-Intersection-from-Fuzzy-Mapping/CMakeLists.txt`:
+
 ```bash
 set(IPCL_DIR "/path/to/install/lib/cmake/ipcl-2.0.0/")
 ```
+
 In the path `IPCL_DIR`, there should exists the file `IPCLConfig.cmake`.
 
 ### Compile FPSI
+
 ```bash
 ##############################
 # libOTe, pailliercryptolib, and Fuzzy-Private-Set-Intersection-from-Fuzzy-Mapping are three parallel folders in the same path
@@ -64,6 +69,7 @@ make
 ```
 
 ## Build with docker
+
 We highly suggest using this dockerfile-based approach.
 
 ```bash
@@ -73,6 +79,7 @@ docker build --no-cache -t [Your Image Name] .
 docker run -itd --net=host --name [Your Container Name] --cap-add=NET_ADMIN [Your Image ID] /bin/bash
 docker exec -it [Your Container ID] /bin/bash 
 ```
+
 ## Run the code
 
 ##### Print help information
@@ -103,4 +110,3 @@ Run our FPSI for Hamming distance in a 128-dimensional space with threshold of 5
 # run FPSI 
 ./main -fpsi -t13 -hamdelta 5 -hams 6 -hamr 6 -hami 6
 ```
-

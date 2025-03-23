@@ -4,28 +4,34 @@
 
 using namespace oc;
 
-int main(int argc, char** argv){
-	CLP cmd;
-	cmd.parse(argc, argv);
+int main(int argc, char **argv)
+{
+    CLP cmd;
+    cmd.parse(argc, argv);
 
-	bool flagSet = false;
+    if (cmd.isSet("fpsi"))
+    {
+        oc::test_fpsi(cmd);
+        return 0;
+    }
 
-	if (cmd.isSet("fpsi"))
-	{
-		oc::test_fpsi(cmd);
-		return 0;
-	}
+    if (cmd.isSet("phe"))
+    {
+        oc::test_paillier_performance(cmd);
+        return 0;
+    }
 
-	if (flagSet == false)
-	{
+    if (true)
+    {
 
-		std::cout
-			<< "#######################################################\n"
-			<< "#                  - FPSI from Fmap -                 #\n"
-			<< "#               A library for performing              #\n"
-			<< "#                         FPSI.                       #\n"
-			<< "#                                                     #\n"
-			<< "#######################################################\n" << std::endl;
+        std::cout
+            << "#######################################################\n"
+            << "#                  - FPSI from Fmap -                 #\n"
+            << "#               A library for performing              #\n"
+            << "#                         FPSI.                       #\n"
+            << "#                                                     #\n"
+            << "#######################################################\n"
+            << std::endl;
 
         std::cout
             << "  -fpsi   " << ": to run the FPSI protocols.                                                     " << "\n"
@@ -61,6 +67,6 @@ int main(int argc, char** argv){
             // << "-hamside " << ": to choose the bitsize of super-component, default hamside = ((dimension / (delta + 1)) / 8) * 8." << "\n"
             ;
 
-	return 0;
+        return 0;
     }
 }
