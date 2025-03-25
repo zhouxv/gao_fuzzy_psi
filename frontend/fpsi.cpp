@@ -1,11 +1,16 @@
 ///////////////////////////
 
 #include "fpsi.h"
+#include <cmath>
 #include <iostream>
 #include <ipcl/ciphertext.hpp>
 #include <ipcl/plaintext.hpp>
+#include <numeric>
+#include <ostream>
+#include <stdexcept>
 #include <thread>
 #include <unistd.h>
+#include <utility>
 #include <vector>
 
 #include "Hamming.h"
@@ -22,38 +27,29 @@ typedef std::chrono::high_resolution_clock::time_point tVar;
 
 namespace osuCrypto {
 /////our protocols///////////
-void test_our_lp_paillier_fpsi(const CLP &cmd) {
-
-  std::cout << "test_our_lp_paillier_fpsi ----------------------------"
-            << std::endl;
-
-  PRNG prng(oc::sysRandomSeed());
-
+std::pair<double, double> test_our_lp_paillier_fpsi(const CLP &cmd) {
   const u64 dimension = cmd.getOr("d", 2);
-  const u64 delta = cmd.getOr("delta", 10);
+  const u64 delta = cmd.getOr("delta", 16);
   const u64 side_length = 1;
   const u64 p = cmd.getOr("p", 2);
-  const u64 recv_set_size = 1ull << cmd.getOr("r", 10);
-  const u64 send_set_size = 1ull << cmd.getOr("s", 10);
-  const u64 intersection_size = cmd.getOr("i", 32);
+  const u64 recv_set_size = 1ull << cmd.getOr("r", 8);
+  const u64 send_set_size = 1ull << cmd.getOr("s", 8);
+  const u64 intersection_size = cmd.getOr("i", 10);
   if ((intersection_size > recv_set_size) |
       (intersection_size > send_set_size)) {
-    printf("intersection_size should not be greater than set_size\n");
-    return;
+    // printf("intersection_size should not be greater than set_size\n");
+    throw std::runtime_error("intersection_size should not be greater than "
+                             "set_size");
   }
 
-  std::cout << "recv_set_size: " << recv_set_size << std::endl;
-  std::cout << "send_set_size: " << send_set_size << std::endl;
-  std::cout << "dimension    : " << dimension << std::endl;
-  std::cout << "delta        : " << delta << std::endl;
-  std::cout << "distance     : l_" << p << std::endl;
+  PRNG prng(oc::sysRandomSeed());
 
   std::vector<std::vector<u64>> receiver_elements(
       recv_set_size, std::vector<u64>(dimension, 0));
   std::vector<std::vector<u64>> sender_elements(send_set_size,
                                                 std::vector<u64>(dimension, 0));
 
-  std::cout << "data init start" << std::endl;
+  // std::cout << "data init start" << std::endl;
   for (u64 i = 0; i < recv_set_size; i++) {
     for (u64 j = 0; j < dimension; j++) {
       receiver_elements[i][j] =
@@ -81,7 +77,7 @@ void test_our_lp_paillier_fpsi(const CLP &cmd) {
     }
   }
 
-  std::cout << "data init done" << std::endl;
+  // std::cout << "data init done" << std::endl;
 
   ///////////////////////////////////////////////////////////////////////////////////////
   // key generate
@@ -129,7 +125,7 @@ void test_our_lp_paillier_fpsi(const CLP &cmd) {
   std::vector<Rist25519_number> send_masks;
   std::vector<Rist25519_number> send_masks_inv;
   fmap::get_mask_cipher(send_set_size, send_masks, send_masks_inv, send_pk);
-  std::cout << "fmap offline done" << std::endl;
+  // std::cout << "fmap offline done" << std::endl;
 
   std::vector<std::vector<block>> fmat_vals;
   fm_paillier::receiver_value_paillier_lp(recv_set_size, fmat_vals, dimension,
@@ -150,16 +146,19 @@ void test_our_lp_paillier_fpsi(const CLP &cmd) {
                                    max_prefix_num);
 
   // fm_paillier::pad_prefixes_k(send_prefixes_k, delta, p);
-  std::cout << "fmat offline done" << std::endl;
+  // std::cout << "fmat offline done" << std::endl;
   time.setTimePoint("offline");
   // ///////////////////////////////////////
+
+  tVar online_time;
 
   auto sockets = coproto::LocalAsyncSocket::makePair();
 
   std::vector<Rist25519_point> recv_vec_dhkk_seedsum(recv_set_size);
   std::vector<Rist25519_point> send_vec_dhkk_seedsum(send_set_size);
 
-  std::cout << "fmap online begin" << std::endl;
+  tStart(online_time);
+  // std::cout << "fmap online begin" << std::endl;
   std::thread thread_fmap_recv(
       fmap::fmap_recv_online, &sockets[0], &receiver_elements, &recv_values,
       &recv_vals_candidate_r, &recv_vals_candidate_skr, &recv_masks,
@@ -173,8 +172,9 @@ void test_our_lp_paillier_fpsi(const CLP &cmd) {
 
   thread_fmap_recv.join();
   thread_fmap_send.join();
+  auto fmap_online_time = tEnd(online_time);
 
-  std::cout << "fmap online done" << std::endl;
+  // std::cout << "fmap online done" << std::endl;
   time.setTimePoint("fmap done");
 
   // if(recv_vec_dhkk_seedsum[369] == send_vec_dhkk_seedsum[369]){
@@ -186,6 +186,8 @@ void test_our_lp_paillier_fpsi(const CLP &cmd) {
 
   // print_vec_point(recv_vec_dhkk_seedsum);
   // print_vec_point(send_vec_dhkk_seedsum);
+
+  tStart(online_time);
 
   std::thread thread_fmat_recv(fm_paillier::fmat_paillier_recv_online,
                                &sockets[0], &receiver_elements,
@@ -199,23 +201,39 @@ void test_our_lp_paillier_fpsi(const CLP &cmd) {
 
   thread_fmat_recv.join();
   thread_fmat_send.join();
+
+  double fmat_online_time = tEnd(online_time);
+
   time.setTimePoint("fmat done");
   time.setTimePoint("online done");
 
   ipcl::setHybridOff();
   ipcl::terminateContext();
 
-  std::cout << (time) << std::endl;
+  // std::cout << (time) << std::endl;
+
+  std::cout << "fmap: " << fmap_online_time << " ms, fmat: " << fmat_online_time
+            << " ms, total time: " << fmap_online_time + fmat_online_time
+            << " ms" << std::endl;
 
   auto recv_bytes_present = sockets[0].bytesSent();
   auto send_bytes_present = sockets[1].bytesSent();
-  std::cout << "[our_lp] recv sends:  " << (recv_bytes_present) / 1024.0 / 1024
-            << "MB" << std::endl;
-  std::cout << "[our_lp] send sends:  " << (send_bytes_present) / 1024.0 / 1024
-            << "MB" << std::endl;
-  std::cout << "[our_lp] comm total:  "
-            << ((recv_bytes_present) + (send_bytes_present)) / 1024.0 / 1024
-            << "MB" << std::endl;
+  // std::cout << "[our_lp] recv sends:  " << (recv_bytes_present) / 1024.0 /
+  // 1024
+  //           << "MB" << std::endl;
+  // std::cout << "[our_lp] send sends:  " << (send_bytes_present) / 1024.0 /
+  // 1024
+  //           << "MB" << std::endl;
+  // std::cout << "[our_lp] comm total:  "
+  //           << ((recv_bytes_present) + (send_bytes_present)) / 1024.0 / 1024
+  //           << "MB" << std::endl;
+  std::cout << "[our_lp] recv sends:  "
+            << (recv_bytes_present) / 1024.0 / 1024.0
+            << " MB, [our_lp] send sends:  "
+            << (send_bytes_present) / 1024.0 / 1024
+            << " MB,[our_lp] comm total:  "
+            << ((recv_bytes_present) + (send_bytes_present)) / 1024.0 / 1024.0
+            << " MB" << std::endl;
 
   // sockets[0].close();
   // sockets[1].close();
@@ -247,39 +265,33 @@ void test_our_lp_paillier_fpsi(const CLP &cmd) {
     mycout << time << std::endl << std::endl;
     mycout.close();
   }
-  return;
+
+  return {fmap_online_time + fmat_online_time,
+          ((recv_bytes_present) + (send_bytes_present)) / 1024.0 / 1024.0};
 }
 
-void test_our_linfty_paillier_fpsi(const CLP &cmd) {
-  std::cout << "test_our_linfty_paillier_fpsi ----------------------------"
-            << std::endl;
-  PRNG prng(oc::sysRandomSeed());
-
+std::pair<double, double> test_our_linfty_paillier_fpsi(const CLP &cmd) {
   const u64 dimension = cmd.getOr("d", 2);
-  const u64 delta = cmd.getOr("delta", 10);
+  const u64 delta = cmd.getOr("delta", 16);
   const u64 side_length = 1;
   const u64 p = 0;
-  const u64 recv_set_size = 1ull << cmd.getOr("r", 10);
-  const u64 send_set_size = 1ull << cmd.getOr("s", 10);
-  const u64 intersection_size = cmd.getOr("i", 32);
+  const u64 recv_set_size = 1ull << cmd.getOr("r", 8);
+  const u64 send_set_size = 1ull << cmd.getOr("s", 8);
+  const u64 intersection_size = cmd.getOr("i", 10);
   if ((intersection_size > recv_set_size) |
       (intersection_size > send_set_size)) {
-    printf("intersection_size should not be greater than set_size\n");
-    return;
+    throw std::runtime_error(
+        "intersection_size should not be greater than set_size");
   }
 
-  std::cout << "recv_set_size: " << recv_set_size << std::endl;
-  std::cout << "send_set_size: " << send_set_size << std::endl;
-  std::cout << "dimension    : " << dimension << std::endl;
-  std::cout << "delta        : " << delta << std::endl;
-  std::cout << "distance     : l_infty" << std::endl;
+  PRNG prng(oc::sysRandomSeed());
 
   std::vector<std::vector<u64>> receiver_elements(
       recv_set_size, std::vector<u64>(dimension, 0));
   std::vector<std::vector<u64>> sender_elements(send_set_size,
                                                 std::vector<u64>(dimension, 0));
 
-  std::cout << "data init begin" << std::endl;
+  // std::cout << "data init begin" << std::endl;
 
   for (u64 i = 0; i < recv_set_size; i++) {
     for (u64 j = 0; j < dimension; j++) {
@@ -308,7 +320,7 @@ void test_our_linfty_paillier_fpsi(const CLP &cmd) {
           ((i8)((prng.get<u8>()) % (delta - 1)) - delta / 2);
     }
   }
-  std::cout << "data init done" << std::endl;
+  // std::cout << "data init done" << std::endl;
 
   ///////////////////////////////////////////////////////////////////////////////////////
   // key generate
@@ -336,6 +348,9 @@ void test_our_linfty_paillier_fpsi(const CLP &cmd) {
   // offline
   // //////////////////////////////////////////////////////////////////////////////
   time.setTimePoint("Start");
+
+  tVar online_time;
+
   std::stack<Rist25519_number> recv_vals_candidate_r;
   std::stack<Rist25519_number> recv_vals_candidate_skr;
   std::vector<std::vector<Rist25519_number>> recv_values;
@@ -354,21 +369,23 @@ void test_our_linfty_paillier_fpsi(const CLP &cmd) {
   std::vector<Rist25519_number> send_masks;
   std::vector<Rist25519_number> send_masks_inv;
   fmap::get_mask_cipher(send_set_size, send_masks, send_masks_inv, send_pk);
-  std::cout << "fmap offline done" << std::endl;
+  // std::cout << "fmap offline done" << std::endl;
 
   std::vector<std::vector<block>> fmat_vals;
   fm_paillier::receiver_value_paillier_linfty(recv_set_size, fmat_vals,
                                               dimension, delta, paillier_key);
-  std::cout << "fmat offline done" << std::endl;
+  // std::cout << "fmat offline done" << std::endl;
   time.setTimePoint("offline");
   // ///////////////////////////////////////
+
+  tStart(online_time);
 
   auto sockets = coproto::LocalAsyncSocket::makePair();
 
   std::vector<Rist25519_point> recv_vec_dhkk_seedsum(recv_set_size);
   std::vector<Rist25519_point> send_vec_dhkk_seedsum(send_set_size);
 
-  std::cout << "fmap online begin" << std::endl;
+  // std::cout << "fmap online begin" << std::endl;
   std::thread thread_fmap_recv(
       fmap::fmap_recv_online, &sockets[0], &receiver_elements, &recv_values,
       &recv_vals_candidate_r, &recv_vals_candidate_skr, &recv_masks,
@@ -382,14 +399,17 @@ void test_our_linfty_paillier_fpsi(const CLP &cmd) {
 
   thread_fmap_recv.join();
   thread_fmap_send.join();
+  double fmap_online_time = tEnd(online_time);
 
   auto recv_bytes_present_fmap = sockets[0].bytesSent();
   auto send_bytes_present_fmap = sockets[1].bytesSent();
 
-  std::cout << "fmap online done" << std::endl;
+  // std::cout << "fmap online done" << std::endl;
   time.setTimePoint("fmap done");
   // print_vec_point(recv_vec_dhkk_seedsum);
   // print_vec_point(send_vec_dhkk_seedsum);
+
+  tStart(online_time);
 
   std::thread thread_fmat_recv(fm_paillier::fmat_paillier_linfty_recv_online,
                                &sockets[0], &receiver_elements,
@@ -403,28 +423,45 @@ void test_our_linfty_paillier_fpsi(const CLP &cmd) {
 
   thread_fmat_recv.join();
   thread_fmat_send.join();
+
+  double fmat_online_time = tEnd(online_time);
+
   time.setTimePoint("fmat done");
   time.setTimePoint("online done");
 
-  std::cout << (time) << std::endl;
+  // std::cout << (time) << std::endl;
+
+  std::cout << "fmap: " << fmap_online_time << " ms, fmat: " << fmat_online_time
+            << " ms, total time: " << fmap_online_time + fmat_online_time
+            << std::endl;
 
   auto recv_bytes_present = sockets[0].bytesSent();
   auto send_bytes_present = sockets[1].bytesSent();
-  std::cout << "[our_linfty] recv sends:  "
-            << (recv_bytes_present) / 1024.0 / 1024 << "MB" << std::endl;
-  std::cout << "[our_linfty] send sends:  "
-            << (send_bytes_present) / 1024.0 / 1024 << "MB" << std::endl;
-  std::cout << "[our_linfty] comm total:  "
-            << ((recv_bytes_present) + (send_bytes_present)) / 1024.0 / 1024
-            << "MB" << std::endl;
-  std::cout << "[our_fmap] recv sends:  "
-            << (recv_bytes_present_fmap) / 1024.0 / 1024 << "MB" << std::endl;
-  std::cout << "[our_fmap] send sends:  "
-            << (send_bytes_present_fmap) / 1024.0 / 1024 << "MB" << std::endl;
-  std::cout << "[our_fmap] comm total:  "
-            << ((recv_bytes_present_fmap) + (send_bytes_present_fmap)) /
-                   1024.0 / 1024
-            << "MB" << std::endl;
+  // std::cout << "[our_linfty] recv sends:  "
+  //           << (recv_bytes_present) / 1024.0 / 1024 << "MB" << std::endl;
+  // std::cout << "[our_linfty] send sends:  "
+  //           << (send_bytes_present) / 1024.0 / 1024 << "MB" << std::endl;
+  // std::cout << "[our_linfty] comm total:  "
+  //           << ((recv_bytes_present) + (send_bytes_present)) / 1024.0 / 1024
+  //           << "MB" << std::endl;
+
+  std::cout << "[our_lp] recv sends:  " << (recv_bytes_present) / 1024.0 / 1024
+            << " MB, [our_lp] send sends:  "
+            << (send_bytes_present) / 1024.0 / 1024.0
+            << " MB,[our_lp] comm total:  "
+            << ((recv_bytes_present) + (send_bytes_present)) / 1024.0 / 1024.0
+            << " MB" << std::endl;
+
+  // std::cout << "[our_fmap] recv sends:  "
+  //           << (recv_bytes_present_fmap) / 1024.0 / 1024 << "MB" <<
+  //           std::endl;
+  // std::cout << "[our_fmap] send sends:  "
+  //           << (send_bytes_present_fmap) / 1024.0 / 1024 << "MB" <<
+  //           std::endl;
+  // std::cout << "[our_fmap] comm total:  "
+  //           << ((recv_bytes_present_fmap) + (send_bytes_present_fmap)) /
+  //                  1024.0 / 1024
+  //           << "MB" << std::endl;
 
   // sockets[0].close();
   // sockets[1].close();
@@ -458,7 +495,8 @@ void test_our_linfty_paillier_fpsi(const CLP &cmd) {
     mycout.close();
   }
 
-  return;
+  return {fmap_online_time + fmat_online_time,
+          ((recv_bytes_present) + (send_bytes_present)) / 1024.0 / 1024.0};
 }
 
 void test_gm_fpsi_hamming(const CLP &cmd) {
@@ -1136,26 +1174,91 @@ void test_gm_fpsi_hamming(const CLP &cmd) {
 //         return;
 //     }
 
-bool test_fpsi(const CLP &clp) {
+bool test_fpsi(const CLP &cmd) {
 
-  bool lp_our = clp.isSet("t11");
-  bool linfty_paillier_our = clp.isSet("t12");
-  bool hamming_gm_our = clp.isSet("t13");
+  bool lp_our = cmd.isSet("t11");
+  bool linfty_paillier_our = cmd.isSet("t12");
+  bool hamming_gm_our = cmd.isSet("t13");
 
-  bool lp_bp = clp.isSet("t21");
-  bool linfty_bp = clp.isSet("t22");
+  bool lp_bp = cmd.isSet("t21");
+  bool linfty_bp = cmd.isSet("t22");
 
-  bool lp_bp_high = clp.isSet("t23");
-  bool linfty_bp_high = clp.isSet("t24");
+  bool lp_bp_high = cmd.isSet("t23");
+  bool linfty_bp_high = cmd.isSet("t24");
 
   if (lp_our) {
-    test_our_lp_paillier_fpsi(clp);
+    const u64 dimension = cmd.getOr("d", 2);
+    const u64 delta = cmd.getOr("delta", 16);
+    const u64 side_length = 1;
+    const u64 p = 0;
+    const u64 recv_set_size = 1ull << cmd.getOr("r", 8);
+    const u64 send_set_size = 1ull << cmd.getOr("s", 8);
+    const u64 intersection_size = cmd.getOr("i", 10);
+    const u64 trait = cmd.getOr("trait", 10);
+    if ((intersection_size > recv_set_size) |
+        (intersection_size > send_set_size)) {
+      throw std::runtime_error("intersection_size > set_size");
+    }
+
+    std::cout << "recv_set_size: " << recv_set_size << std::endl;
+    std::cout << "send_set_size: " << send_set_size << std::endl;
+    std::cout << "dimension    : " << dimension << std::endl;
+    std::cout << "delta        : " << delta << std::endl;
+    std::cout << "distance     : l_infty" << std::endl;
+
+    std::cout << "测试次数      : " << trait << std::endl;
+
+    std::vector<double> times(trait), comus(trait);
+    for (u64 i = 0; i < trait; i++) {
+      auto tmp = test_our_lp_paillier_fpsi(cmd);
+      times[i] = tmp.first;
+      comus[i] = tmp.second;
+    }
+
+    auto avg_time = std::accumulate(times.begin(), times.end(), 0.0) / trait;
+    auto avg_com = std::accumulate(comus.begin(), comus.end(), 0.0) / trait;
+
+    std::cout << "平均时间 : " << avg_time << " ms ; 平均通信量: " << avg_com
+              << " MB" << std::endl;
   }
+
   if (linfty_paillier_our) {
-    test_our_linfty_paillier_fpsi(clp);
+    const u64 dimension = cmd.getOr("d", 2);
+    const u64 delta = cmd.getOr("delta", 16);
+    const u64 side_length = 1;
+    const u64 p = 0;
+    const u64 recv_set_size = 1ull << cmd.getOr("r", 8);
+    const u64 send_set_size = 1ull << cmd.getOr("s", 8);
+    const u64 intersection_size = cmd.getOr("i", 10);
+    const u64 trait = cmd.getOr("trait", 10);
+    if ((intersection_size > recv_set_size) |
+        (intersection_size > send_set_size)) {
+      throw std::runtime_error("intersection_size > set_size");
+    }
+
+    std::cout << "recv_set_size: " << recv_set_size << std::endl;
+    std::cout << "send_set_size: " << send_set_size << std::endl;
+    std::cout << "dimension    : " << dimension << std::endl;
+    std::cout << "delta        : " << delta << std::endl;
+    std::cout << "distance     : l_infty" << std::endl;
+
+    std::cout << "测试次数      : " << trait << std::endl;
+
+    std::vector<double> times(trait), comus(trait);
+    for (u64 i = 0; i < trait; i++) {
+      auto tmp = test_our_linfty_paillier_fpsi(cmd);
+      times[i] = tmp.first;
+      comus[i] = tmp.second;
+    }
+
+    auto avg_time = std::accumulate(times.begin(), times.end(), 0.0) / trait;
+    auto avg_com = std::accumulate(comus.begin(), comus.end(), 0.0) / trait;
+
+    std::cout << "平均时间 : " << avg_time << " ms ; 平均通信量: " << avg_com
+              << " MB" << std::endl;
   }
   if (hamming_gm_our) {
-    test_gm_fpsi_hamming(clp);
+    test_gm_fpsi_hamming(cmd);
   }
 
   // if(lp_bp){

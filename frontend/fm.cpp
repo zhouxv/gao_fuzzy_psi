@@ -13,7 +13,7 @@ std::vector<element> run_ot_receiver(coproto::LocalAsyncSocket &channel,
 
   if (numOTs <= OT_NUMS_BOUND) // using libOTe-CO15
   {
-    PRNG prng(block(oc::sysRandomSeed()));
+    PRNG prng((block(oc::sysRandomSeed())));
     osuCrypto::DefaultBaseOT baseOTs;
     std::vector<block> mask(numOTs);
     std::vector<block> maskMsg(numOTs);
