@@ -1190,11 +1190,12 @@ bool test_fpsi(const CLP &cmd) {
     const u64 dimension = cmd.getOr("d", 2);
     const u64 delta = cmd.getOr("delta", 16);
     const u64 side_length = 1;
-    const u64 p = 0;
+    const u64 p = cmd.getOr("p", 2);
     const u64 recv_set_size = 1ull << cmd.getOr("r", 8);
     const u64 send_set_size = 1ull << cmd.getOr("s", 8);
     const u64 intersection_size = cmd.getOr("i", 10);
     const u64 trait = cmd.getOr("trait", 10);
+
     if ((intersection_size > recv_set_size) |
         (intersection_size > send_set_size)) {
       throw std::runtime_error("intersection_size > set_size");
@@ -1204,7 +1205,7 @@ bool test_fpsi(const CLP &cmd) {
     std::cout << "send_set_size: " << send_set_size << std::endl;
     std::cout << "dimension    : " << dimension << std::endl;
     std::cout << "delta        : " << delta << std::endl;
-    std::cout << "distance     : l_infty" << std::endl;
+    std::cout << "distance     : l_" << p << std::endl;
 
     std::cout << "测试次数      : " << trait << std::endl;
 
