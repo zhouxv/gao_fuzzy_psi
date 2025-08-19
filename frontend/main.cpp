@@ -11,6 +11,7 @@ int main(int argc, char **argv) {
 
   if (cmd.isSet("shash")) {
     oc::test_shash(cmd);
+
     return 0;
   }
 
