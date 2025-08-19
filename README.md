@@ -24,7 +24,7 @@ sudo apt install libgmp-dev
 git clone https://github.com/osu-crypto/libOTe.git
 cd libOTe
 python3 build.py --all --boost --sodium
-python3 build.py --install=../install/
+python3 build.py --install=../out/install/
 cd ..
 
 ##############################
@@ -35,7 +35,7 @@ sudo apt-get install libssl-dev
 git clone https://github.com/intel/pailliercryptolib.git
 cd pailliercryptolib/
 export IPCL_ROOT=$(pwd)
-sudo cmake -S . -B build -DCMAKE_INSTALL_PREFIX=../install/ -DCMAKE_BUILD_TYPE=Release -DIPCL_TEST=OFF -DIPCL_BENCHMARK=OFF
+sudo cmake -S . -B build -DCMAKE_INSTALL_PREFIX=../out/install/ -DCMAKE_BUILD_TYPE=Release -DIPCL_TEST=OFF -DIPCL_BENCHMARK=OFF
 sudo cmake --build build -j
 sudo cmake --build build --target install -j
 cd ..

@@ -1057,7 +1057,7 @@ void fmat_paillier_recv_online(
   BitVector result;
   fm_paillier::prefixes_check(send_prefixes_kk, recv_prefixes_kk, result);
 
-  printf("FPSI-CA:%d\n", result.hammingWeight());
+  // printf("FPSI-CA:%d\n", result.hammingWeight());
 
   // std::cout << "fmat_paillier_recv_online: run_ot_receiver begin" <<
   // std::endl;
@@ -1283,7 +1283,7 @@ void fmat_paillier_linfty_recv_online(
   BitVector result;
   fm_paillier::dh_check(vec_recv_point_kk, vec_send_point_kk, result);
 
-  printf("FPSI-CA:%d\n", result.hammingWeight());
+  // printf("FPSI-CA:%d\n", result.hammingWeight());
 
   // printf("FPSI-CA:%d\n", result.hammingWeight());
 

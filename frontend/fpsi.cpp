@@ -230,7 +230,7 @@ std::pair<double, double> test_our_lp_paillier_fpsi(const CLP &cmd) {
   std::cout << "[our_lp] recv sends:  "
             << (recv_bytes_present) / 1024.0 / 1024.0
             << " MB, [our_lp] send sends:  "
-            << (send_bytes_present) / 1024.0 / 1024
+            << (send_bytes_present) / 1024.0 / 1024.0
             << " MB,[our_lp] comm total:  "
             << ((recv_bytes_present) + (send_bytes_present)) / 1024.0 / 1024.0
             << " MB" << std::endl;
@@ -431,9 +431,10 @@ std::pair<double, double> test_our_linfty_paillier_fpsi(const CLP &cmd) {
 
   // std::cout << (time) << std::endl;
 
-  std::cout << "fmap: " << fmap_online_time << " ms, fmat: " << fmat_online_time
-            << " ms, total time: " << fmap_online_time + fmat_online_time
-            << std::endl;
+  // std::cout << "fmap: " << fmap_online_time << " ms, fmat: " <<
+  // fmat_online_time
+  //           << " ms, total time: " << fmap_online_time + fmat_online_time
+  //           << std::endl;
 
   auto recv_bytes_present = sockets[0].bytesSent();
   auto send_bytes_present = sockets[1].bytesSent();
@@ -445,12 +446,14 @@ std::pair<double, double> test_our_linfty_paillier_fpsi(const CLP &cmd) {
   //           << ((recv_bytes_present) + (send_bytes_present)) / 1024.0 / 1024
   //           << "MB" << std::endl;
 
-  std::cout << "[our_lp] recv sends:  " << (recv_bytes_present) / 1024.0 / 1024
-            << " MB, [our_lp] send sends:  "
-            << (send_bytes_present) / 1024.0 / 1024.0
-            << " MB,[our_lp] comm total:  "
-            << ((recv_bytes_present) + (send_bytes_present)) / 1024.0 / 1024.0
-            << " MB" << std::endl;
+  // std::cout << "[our_lin] recv sends:  "
+  //           << (recv_bytes_present) / 1024.0 / 1024.0
+  //           << " MB, [our_lin] send sends:  "
+  //           << (send_bytes_present) / 1024.0 / 1024.0
+  //           << " MB,[our_lin] comm total:  "
+  //           << ((recv_bytes_present) + (send_bytes_present)) / 1024.0 /
+  //           1024.0
+  //           << " MB" << std::endl;
 
   // std::cout << "[our_fmap] recv sends:  "
   //           << (recv_bytes_present_fmap) / 1024.0 / 1024 << "MB" <<
@@ -466,7 +469,7 @@ std::pair<double, double> test_our_linfty_paillier_fpsi(const CLP &cmd) {
   // sockets[0].close();
   // sockets[1].close();
 
-  std::cout << std::endl;
+  // std::cout << std::endl;
 
   const bool out_to_file = cmd.isSet("file");
   if (out_to_file) {
@@ -1231,19 +1234,17 @@ bool test_fpsi(const CLP &cmd) {
     const u64 recv_set_size = 1ull << cmd.getOr("r", 8);
     const u64 send_set_size = 1ull << cmd.getOr("s", 8);
     const u64 intersection_size = cmd.getOr("i", 10);
-    const u64 trait = cmd.getOr("trait", 10);
+    const u64 trait = cmd.getOr("trait", 1);
     if ((intersection_size > recv_set_size) |
         (intersection_size > send_set_size)) {
       throw std::runtime_error("intersection_size > set_size");
     }
 
-    std::cout << "recv_set_size: " << recv_set_size << std::endl;
-    std::cout << "send_set_size: " << send_set_size << std::endl;
-    std::cout << "dimension    : " << dimension << std::endl;
-    std::cout << "delta        : " << delta << std::endl;
-    std::cout << "distance     : l_infty" << std::endl;
-
-    std::cout << "测试次数      : " << trait << std::endl;
+    std::cout << "recv_set_size: " << recv_set_size
+              << " | send_set_size: " << send_set_size
+              << " | dimension: " << dimension << " | delta: " << delta
+              << " | distance: l_infty"
+              << " | 测试次数: " << trait << std::endl;
 
     std::vector<double> times(trait), comus(trait);
     for (u64 i = 0; i < trait; i++) {
