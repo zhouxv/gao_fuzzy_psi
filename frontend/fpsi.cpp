@@ -676,12 +676,6 @@ bool test_fpsi(const CLP &cmd) {
   bool linfty_paillier_our = cmd.isSet("t12");
   bool hamming_gm_our = cmd.isSet("t13");
 
-  bool lp_bp = cmd.isSet("t21");
-  bool linfty_bp = cmd.isSet("t22");
-
-  bool lp_bp_high = cmd.isSet("t23");
-  bool linfty_bp_high = cmd.isSet("t24");
-
   if (lp_our) {
     const u64 dimension = cmd.getOr("d", 2);
     const u64 delta = cmd.getOr("delta", 16);
@@ -752,6 +746,7 @@ bool test_fpsi(const CLP &cmd) {
     std::cout << "平均时间 : " << avg_time << " ms, " << avg_time / 1000.0
               << " s; 平均通信量: " << avg_com << " MB" << std::endl;
   }
+
   if (hamming_gm_our) {
     test_gm_fpsi_hamming(cmd);
   }

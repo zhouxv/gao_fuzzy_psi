@@ -32,9 +32,9 @@ COPY ./Goldwasser-Micali ./Goldwasser-Micali
 COPY ./RBOKVS ./RBOKVS
 COPY ./CMakeLists.txt ./
 COPY ./run_bench.sh ./
+COPY ./run_bench_hash.sh ./
 
-
-RUN chmod +x ./run_bench.sh && \
+RUN chmod +x ./*.sh && \
     mkdir build && \
     cd build && \
     cmake .. && \
