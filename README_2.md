@@ -1,6 +1,9 @@
 ```bash
 sudo docker build -t gao_ufpsi:latest .
 
+docker tag gao_ufpsi:latest blueobsidian/gao_ufpsi:latest
+docker push blueobsidian/gao_ufpsi:latest
+
 sudo docker run -dit --name gao_ufpsi_100Mbps --cap-add=NET_ADMIN --cpuset-cpus="64,66,68,70,72,74,76,78,80,82,84,86,88,90,92,94" --cpus=16 --memory=128g --memory-swap=128g gao_ufpsi:latest
 
 sudo docker run -dit --name gao_ufpsi_10Mbps --cap-add=NET_ADMIN --cpuset-cpus="96,98,100,102,104,106,108,110,112,114,116,118,120,122,124,126" --cpus=16 --memory=128g --memory-swap=128g gao_ufpsi:latest
