@@ -1,9 +1,9 @@
 FROM ubuntu:22.04
 
-RUN apt-get update && \
-    apt-get install -y build-essential cmake git libtool iproute2 python3 python3-pip sudo nasm libssl-dev libgmp-dev && \
-    pip install tcconfig && \
-    rm -rf /var/lib/apt/lists/*
+RUN apt-get update
+RUN apt-get install -y net-tools iproute2 python3 python3-pip
+RUN pip install tcconfig
+RUN apt-get install -y build-essential cmake git libtool sudo nasm libssl-dev libgmp-dev
 
 WORKDIR /app
 
@@ -12,6 +12,7 @@ RUN git clone https://github.com/intel/pailliercryptolib.git && \
 
 WORKDIR /app/libOTe
 
+COPY ./boost_1_86_0.tar.bz2 ./out
 RUN python3 build.py --all --boost --sodium && \
     python3 build.py --install=/app/out/install
 
@@ -34,9 +35,9 @@ COPY ./CMakeLists.txt ./
 COPY ./run_bench.sh ./
 COPY ./run_bench_hash.sh ./
 
-RUN chmod +x ./*.sh && \
-    mkdir build && \
-    cd build && \
-    cmake .. && \
-    make -j && \
-    cp ./main ../
+# RUN chmod +x ./*.sh && \
+#     mkdir build && \
+#     cd build && \
+#     cmake .. && \
+#     make -j && \
+#     cp ./main ../

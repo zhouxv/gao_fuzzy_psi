@@ -1,4 +1,6 @@
 #include "fm.h"
+#include <ipcl/bignum.h>
+#include <vector>
 
 using segment = std::array<oc::u64, 2>;
 using block = oc::block;
@@ -522,13 +524,18 @@ void receiver_value_paillier_linfty(const std::size_t &elements_size,
   ipcl::PlainText pt_zero = ipcl::PlainText(vec_zero_cipher);
   ipcl::CipherText ct_zero = paillier_key.pub_key.encrypt(pt_zero);
 
+  std::vector<std::vector<block>> bignum_blk_vec;
+  for (u64 i = 0; i < 2 * delta + 1; i++) {
+    bignum_blk_vec.push_back(bignumer_to_block_vector(ct_zero.getElement(i)));
+  }
+
   for (u64 i = 0; i < elements_size; i++) {
     for (u64 j = 0; j < dimension; j++) {
-      vals.push_back(bignumer_to_block_vector(ct_zero.getElement(0)));
+      vals.push_back(bignum_blk_vec[0]);
 
       for (u64 k = 1; k <= delta; k++) {
-        vals.push_back(bignumer_to_block_vector(ct_zero.getElement(2 * k - 1)));
-        vals.push_back(bignumer_to_block_vector(ct_zero.getElement(2 * k)));
+        vals.push_back(bignum_blk_vec[2 * k - 1]);
+        vals.push_back(bignum_blk_vec[2 * k]);
       }
     }
   }
