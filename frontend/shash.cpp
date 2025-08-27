@@ -67,7 +67,6 @@ std::pair<double, double> test_sas_fm(const CLP &cmd) {
           ((i8)((prng.get<u8>()) % (delta - 1)) - delta / 2);
     }
   }
-  std::cout << "data init done" << std::endl;
 
   ///////////////////////////////////////////////////////////////////////////////////////
   // key generate
@@ -323,7 +322,7 @@ std::pair<double, double> test_sas_fm_origin(const CLP &cmd) {
 void test_shash(const CLP &cmd) {
 
   const u64 dimension = cmd.getOr("d", 2);
-  const u64 delta = cmd.getOr("delta", 16);
+  const u64 delta = cmd.getOr("delta", 10);
   const u64 side_length = 1;
   const u64 p = 0;
   const u64 recv_set_size = 1ull << cmd.getOr("r", 8);
