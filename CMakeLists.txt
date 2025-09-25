@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.22)
 project(FPSI)
 
+set(CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/out/install")
+
 include_directories(frontend)
 include_directories(fuzzy_mapping)
 include_directories(Goldwasser-Micali)

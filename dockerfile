@@ -19,6 +19,15 @@ RUN apt-get update && \
     # install tcconfig for network interface configuration
     pip install tcconfig
 
+# upgrade gcc g++ to version 13
+RUN add-apt-repository ppa:ubuntu-toolchain-r/test -y && \
+    apt-get update && \
+    apt-get install -y gcc-13 g++-13 && \
+    update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-13 90 && \
+    update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-13 90 && \
+    update-alternatives --set gcc /usr/bin/gcc-13 && \
+    update-alternatives --set g++ /usr/bin/g++-13
+
 WORKDIR /app
 
 RUN git clone https://github.com/intel/pailliercryptolib.git && \
