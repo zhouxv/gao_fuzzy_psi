@@ -37,7 +37,7 @@ target_link_libraries(main ${CMAKE_SOURCE_DIR}/BLAKE3/libblake3.so)
 # ############################################
 # Link  IPCL                     #
 # ############################################
-set(IPCL_DIR "./install/lib/cmake/ipcl-2.0.0/")
+set(IPCL_DIR "${CMAKE_SOURCE_DIR}/install/lib/cmake/ipcl-2.0.0/")
 
 find_package(IPCL 2.0.0
     HINTS
