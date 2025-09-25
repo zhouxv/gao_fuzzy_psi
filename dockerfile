@@ -1,32 +1,55 @@
 FROM ubuntu:22.04
 
+# Install dependencies
 RUN apt-get update && \
-apt-get install -y build-essential cmake git libtool iproute2 python3 sudo nasm libssl-dev libgmp-dev && \
-rm -rf /var/lib/apt/lists/*
+    apt-get install -y \
+    git \
+    python3 \
+    python3-pip \
+    cmake \
+    libgmp-dev \
+    libspdlog-dev \
+    libtool \
+    nasm \
+    libssl-dev \
+    libmpfr-dev \
+    iproute2 \
+    net-tools \
+    software-properties-common && \
+    # install tcconfig for network interface configuration
+    pip install tcconfig
 
 WORKDIR /app
 
 RUN git clone https://github.com/intel/pailliercryptolib.git && \
-git clone https://github.com/osu-crypto/libOTe.git && \
-git clone https://github.com/ql70ql70/Fuzzy-Private-Set-Intersection-from-Fuzzy-Mapping.git
-
-WORKDIR /app/pailliercryptolib
-
-RUN cmake -S . -B build -DCMAKE_INSTALL_PREFIX=/path/to/install/ -DCMAKE_BUILD_TYPE=Release -DIPCL_TEST=OFF -DIPCL_BENCHMARK=OFF && \
-cmake --build build -j 10 && \
-cmake --build build --target install -j 10 && \
-export IPCL_DIR=/path/to/install/lib/cmake/ipcl-2.0.0/
+    git clone https://github.com/osu-crypto/libOTe.git
 
 WORKDIR /app/libOTe
 
 RUN python3 build.py --all --boost --sodium && \
-python3 build.py --install=./out/install/linux
+    python3 build.py --install=/app/out/install
 
-WORKDIR /app/Fuzzy-Private-Set-Intersection-from-Fuzzy-Mapping
+WORKDIR /app/pailliercryptolib
 
-RUN mkdir build
+RUN cmake -S . -B build -DCMAKE_INSTALL_PREFIX=/app/out/install -DCMAKE_BUILD_TYPE=Release -DIPCL_TEST=OFF -DIPCL_BENCHMARK=OFF && \
+    cmake --build build -j && \
+    cmake --build build --target install -j
 
-WORKDIR /app/Fuzzy-Private-Set-Intersection-from-Fuzzy-Mapping/build
 
-RUN cmake .. && \
-make
+WORKDIR /app
+
+COPY ./BLAKE3 ./BLAKE3
+COPY ./FPSI-for-Hamming ./FPSI-for-Hamming
+COPY ./frontend ./frontend
+COPY ./fuzzy_mapping ./fuzzy_mapping
+COPY ./Goldwasser-Micali ./Goldwasser-Micali
+COPY ./RBOKVS ./RBOKVS
+COPY ./CMakeLists.txt ./
+COPY ./shell_run_bench.sh ./
+
+
+RUN chmod +x ./*.sh && \
+    mkdir build && \
+    cd build && \
+    cmake .. && \
+    make -j 
