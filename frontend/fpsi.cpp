@@ -675,10 +675,9 @@ std::pair<double, double> test_our_linfty_paillier_fpsi(const CLP &cmd) {
 
   // std::cout << (time) << std::endl;
 
-  // std::cout << "fmap: " << fmap_online_time << " ms, fmat: " <<
-  // fmat_online_time
-  //           << " ms, total time: " << fmap_online_time + fmat_online_time
-  //           << std::endl;
+  std::cout << "fmap: " << fmap_online_time << " ms, fmat: " << fmat_online_time
+            << " ms, total time: " << fmap_online_time + fmat_online_time
+            << std::endl;
 
   auto recv_bytes_present = sockets[0].bytesSent();
   auto send_bytes_present = sockets[1].bytesSent();

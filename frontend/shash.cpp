@@ -88,7 +88,7 @@ std::pair<double, double> test_sas_fm(const CLP &cmd) {
   ipcl::KeyPair paillier_key = ipcl::generateKeypair(2048, true);
   ipcl::setHybridMode(ipcl::HybridMode::OPTIMAL);
 
-  std::cout << "key gen done" << std::endl;
+  // std::cout << "key gen done" << std::endl;
 
   Timer time;
 
@@ -133,7 +133,7 @@ std::pair<double, double> test_sas_fm(const CLP &cmd) {
       &send_vals_candidate_skr, dimension, delta, side_length, sender_seeds,
       fmath_sender_size);
 
-  std::cout << "fmap offline done" << std::endl;
+  // std::cout << "fmap offline done" << std::endl;
 
   time.setTimePoint("offline");
 
@@ -223,7 +223,7 @@ std::pair<double, double> test_sas_fm_origin(const CLP &cmd) {
           ((i8)((prng.get<u8>()) % (delta - 1)) - delta / 2);
     }
   }
-  std::cout << "data init done" << std::endl;
+  // std::cout << "data init done" << std::endl;
 
   ///////////////////////////////////////////////////////////////////////////////////////
   // key generate
@@ -245,7 +245,7 @@ std::pair<double, double> test_sas_fm_origin(const CLP &cmd) {
   ipcl::KeyPair paillier_key = ipcl::generateKeypair(2048, true);
   ipcl::setHybridMode(ipcl::HybridMode::OPTIMAL);
 
-  std::cout << "key gen done" << std::endl;
+  // std::cout << "key gen done" << std::endl;
 
   Timer time;
 
@@ -275,7 +275,7 @@ std::pair<double, double> test_sas_fm_origin(const CLP &cmd) {
   std::vector<Rist25519_number> send_masks_inv;
   fmap::get_mask_cipher(send_set_size, send_masks, send_masks_inv, send_pk);
 
-  std::cout << "fmap offline done" << std::endl;
+  // std::cout << "fmap offline done" << std::endl;
 
   time.setTimePoint("offline");
 
