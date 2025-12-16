@@ -460,70 +460,7 @@ bool test_fpsi(const CLP &cmd) {
   return 1;
 }
 
-std::pair<double, double> test_fmap_detailed(const CLP &cmd) {
-
-  tVar online_time;
-
-  auto sockets = coproto::LocalAsyncSocket::makePair();
-
-  std::vector<Rist25519_point> recv_vec_dhkk_seedsum(recv_set_size);
-  std::vector<Rist25519_point> send_vec_dhkk_seedsum(send_set_size);
-
-  tStart(online_time);
-  // std::cout << "fmap online begin" << std::endl;
-  std::thread thread_fmap_recv(
-      fmap::fmap_recv_online, &sockets[0], &receiver_elements, &recv_values,
-      &recv_vals_candidate_r, &recv_vals_candidate_skr, &recv_masks,
-      &recv_masks_inv, &recv_vec_dhkk_seedsum, dimension, delta, side_length,
-      recv_sk, recv_pk, recv_dh_sk);
-  std::thread thread_fmap_send(
-      fmap::fmap_send_online, &sockets[1], &sender_elements, &send_values,
-      &send_vals_candidate_r, &send_vals_candidate_skr, &send_masks,
-      &send_masks_inv, &send_vec_dhkk_seedsum, dimension, delta, side_length,
-      send_sk, send_pk, send_dh_sk);
-
-  thread_fmap_recv.join();
-  thread_fmap_send.join();
-  auto fmap_online_time = tEnd(online_time);
-
-  // std::cout << "fmap online done" << std::endl;
-
-  tStart(online_time);
-
-  std::thread thread_fmat_recv(fm_paillier::fmat_paillier_recv_online,
-                               &sockets[0], &receiver_elements,
-                               &recv_vec_dhkk_seedsum, &fmat_vals, dimension,
-                               delta, p, paillier_key, recv_dh_k);
-
-  std::thread thread_fmat_send(
-      fm_paillier::fmat_paillier_send_online, &sockets[1], &sender_elements,
-      &send_vec_dhkk_seedsum, &send_prefixes_k_net, &vec_mask_ct, dimension,
-      delta, p, paillier_key.pub_key, send_dh_k);
-
-  thread_fmat_recv.join();
-  thread_fmat_send.join();
-
-  double fmat_online_time = tEnd(online_time);
-
-  ipcl::setHybridOff();
-  ipcl::terminateContext();
-
-  auto recv_bytes_present = sockets[0].bytesSent();
-  auto send_bytes_present = sockets[1].bytesSent();
-
-  return {fmap_online_time,
-          ((recv_bytes_present) + (send_bytes_present)) / 1024.0 / 1024.0};
-}
-
 bool test_fmap(const CLP &cmd) {
-  const u64 dimension = cmd.getOr("d", 2);
-  const u64 delta = cmd.getOr("delta", 16);
-  const u64 p = cmd.getOr("p", 2);
-  const u64 recv_set_size = 1ull << cmd.getOr("r", 8);
-  const u64 send_set_size = 1ull << cmd.getOr("s", 8);
-  const u64 intersection_size = cmd.getOr("i", 10);
-  const u64 trait = cmd.getOr("trait", 10);
-
   const u64 dimension = cmd.getOr("d", 2);
   const u64 delta = cmd.getOr("delta", 16);
   const u64 side_length = 1;
@@ -531,6 +468,7 @@ bool test_fmap(const CLP &cmd) {
   const u64 recv_set_size = 1ull << cmd.getOr("r", 8);
   const u64 send_set_size = 1ull << cmd.getOr("s", 8);
   const u64 intersection_size = cmd.getOr("i", 10);
+  const u64 trait = cmd.getOr("trait", 10);
   if ((intersection_size > recv_set_size) |
       (intersection_size > send_set_size)) {
     // printf("intersection_size should not be greater than set_size\n");
@@ -647,9 +585,58 @@ bool test_fmap(const CLP &cmd) {
 
   std::vector<double> times(trait), comus(trait);
   for (u64 i = 0; i < trait; i++) {
-    auto tmp = test_fmap_detailed(cmd);
-    times[i] = tmp.first;
-    comus[i] = tmp.second;
+
+    tVar online_time;
+
+    auto sockets = coproto::LocalAsyncSocket::makePair();
+
+    std::vector<Rist25519_point> recv_vec_dhkk_seedsum(recv_set_size);
+    std::vector<Rist25519_point> send_vec_dhkk_seedsum(send_set_size);
+
+    tStart(online_time);
+    // std::cout << "fmap online begin" << std::endl;
+    std::thread thread_fmap_recv(
+        fmap::fmap_recv_online, &sockets[0], &receiver_elements, &recv_values,
+        &recv_vals_candidate_r, &recv_vals_candidate_skr, &recv_masks,
+        &recv_masks_inv, &recv_vec_dhkk_seedsum, dimension, delta, side_length,
+        recv_sk, recv_pk, recv_dh_sk);
+    std::thread thread_fmap_send(
+        fmap::fmap_send_online, &sockets[1], &sender_elements, &send_values,
+        &send_vals_candidate_r, &send_vals_candidate_skr, &send_masks,
+        &send_masks_inv, &send_vec_dhkk_seedsum, dimension, delta, side_length,
+        send_sk, send_pk, send_dh_sk);
+
+    thread_fmap_recv.join();
+    thread_fmap_send.join();
+    auto fmap_online_time = tEnd(online_time);
+
+    // std::cout << "fmap online done" << std::endl;
+
+    tStart(online_time);
+
+    std::thread thread_fmat_recv(fm_paillier::fmat_paillier_recv_online,
+                                 &sockets[0], &receiver_elements,
+                                 &recv_vec_dhkk_seedsum, &fmat_vals, dimension,
+                                 delta, p, paillier_key, recv_dh_k);
+
+    std::thread thread_fmat_send(
+        fm_paillier::fmat_paillier_send_online, &sockets[1], &sender_elements,
+        &send_vec_dhkk_seedsum, &send_prefixes_k_net, &vec_mask_ct, dimension,
+        delta, p, paillier_key.pub_key, send_dh_k);
+
+    thread_fmat_recv.join();
+    thread_fmat_send.join();
+
+    double fmat_online_time = tEnd(online_time);
+
+    ipcl::setHybridOff();
+    ipcl::terminateContext();
+
+    auto recv_bytes_present = sockets[0].bytesSent();
+    auto send_bytes_present = sockets[1].bytesSent();
+
+    times[i] = fmap_online_time;
+    comus[i] = ((recv_bytes_present) + (send_bytes_present)) / 1024.0 / 1024.0;
   }
 
   auto avg_time = std::accumulate(times.begin(), times.end(), 0.0) / trait;
