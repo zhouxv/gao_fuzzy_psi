@@ -55,6 +55,7 @@ COPY ./Goldwasser-Micali ./Goldwasser-Micali
 COPY ./RBOKVS ./RBOKVS
 COPY ./CMakeLists.txt ./
 COPY ./shell_run_bench.sh ./
+COPY ./shell_run_bench_fmap.sh ./
 
 
 RUN chmod +x ./*.sh && \

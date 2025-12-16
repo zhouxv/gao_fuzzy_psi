@@ -13,6 +13,11 @@ int main(int argc, char **argv) {
     return 0;
   }
 
+  if (cmd.isSet("fmap")) {
+    oc::test_fmap(cmd);
+    return 0;
+  }
+
   if (true) {
 
     std::cout << "#######################################################\n"

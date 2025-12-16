@@ -5,4 +5,5 @@
 
 namespace osuCrypto {
 bool test_fpsi(const CLP &clp);
-}
+bool test_fmap(const CLP &clp);
+} // namespace osuCrypto
