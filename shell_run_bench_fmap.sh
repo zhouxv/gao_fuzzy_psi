@@ -23,9 +23,9 @@ printf "[ProType] [Metric] [Dim] [Delta] [Size] [Com.(MB)] [Time(s)]\n"
 for n in "${ns[@]}"; do
   for dim in "${dims[@]}"; do
     for delta in "${deltas[@]}"; do
-      ./build/main -fmap -d $dim -delta $delta -s $n -r $n -i 7 -trait 3
-      # ./build/main -fpsi -t11 -d $dim -delta $delta -s $n -r $n -i 7 -p 1 -trait 3
-      # ./build/main -fpsi -t11 -d $dim -delta $delta -s $n -r $n -i 7 -p 2 -trait 3
+      ./build/main -fmap -d $dim -delta $delta -s $n -r $n -i 7 -trait 2
+      # ./build/main -fpsi -t11 -d $dim -delta $delta -s $n -r $n -i 7 -p 1 -trait 2
+      # ./build/main -fpsi -t11 -d $dim -delta $delta -s $n -r $n -i 7 -p 2 -trait 2
       echo   # 输出空行
     done
   done

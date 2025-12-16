@@ -536,63 +536,42 @@ bool test_fmap(const CLP &cmd) {
   DH25519_number recv_dh_k(prng);
   DH25519_number send_dh_k(prng);
 
-  ///////////////////////////////////////////////////////////////////////////////////////
-  // offline
-  // //////////////////////////////////////////////////////////////////////////////
-
-  std::stack<Rist25519_number> recv_vals_candidate_r;
-  std::stack<Rist25519_number> recv_vals_candidate_skr;
-  std::vector<std::vector<Rist25519_number>> recv_values;
-  fmap::assign_segments(recv_set_size, recv_values, recv_vals_candidate_r,
-                        recv_vals_candidate_skr, dimension, delta, side_length,
-                        recv_sk);
-  std::stack<Rist25519_number> send_vals_candidate_r;
-  std::stack<Rist25519_number> send_vals_candidate_skr;
-  std::vector<std::vector<Rist25519_number>> send_values;
-  fmap::assign_segments(send_set_size, send_values, send_vals_candidate_r,
-                        send_vals_candidate_skr, dimension, delta, side_length,
-                        send_sk);
-  std::vector<Rist25519_number> recv_masks;
-  std::vector<Rist25519_number> recv_masks_inv;
-  fmap::get_mask_cipher(recv_set_size, recv_masks, recv_masks_inv, recv_pk);
-  std::vector<Rist25519_number> send_masks;
-  std::vector<Rist25519_number> send_masks_inv;
-  fmap::get_mask_cipher(send_set_size, send_masks, send_masks_inv, send_pk);
-  // std::cout << "fmap offline done" << std::endl;
-
-  std::vector<std::vector<block>> fmat_vals;
-  fm_paillier::receiver_value_paillier_lp(recv_set_size, fmat_vals, dimension,
-                                          delta, p, paillier_key);
-
-  std::vector<u32> masks;
-  ipcl::CipherText vec_mask_ct;
-  fm_paillier::sender_mask_paillier_lp(send_set_size, masks, vec_mask_ct,
-                                       paillier_key.pub_key);
-  std::vector<std::vector<block>> send_prefixes;
-  std::vector<std::vector<DH25519_point>> send_prefixes_k;
-  u64 max_prefix_num =
-      fm_paillier::sender_get_prefixes(masks, send_prefixes, delta, p);
-  fm_paillier::prefixes_pow_sk(send_prefixes, send_prefixes_k, send_dh_k);
-
-  std::vector<DH25519_point> send_prefixes_k_net;
-  fm_paillier::pad_send_prefixes_k(send_prefixes_k, send_prefixes_k_net,
-                                   max_prefix_num);
-
-  // fm_paillier::pad_prefixes_k(send_prefixes_k, delta, p);
-  // std::cout << "fmat offline done" << std::endl;
-
   // ///////////////////////////////////////
 
   std::vector<double> times(trait), comus(trait);
   for (u64 i = 0; i < trait; i++) {
+    ///////////////////////////////////////////////////////////////////////////////////////
+    // offline
+    // ///////////////////////////////////////////////////////////////////////////////////
 
-    tVar online_time;
+    std::stack<Rist25519_number> recv_vals_candidate_r;
+    std::stack<Rist25519_number> recv_vals_candidate_skr;
+    std::vector<std::vector<Rist25519_number>> recv_values;
+    fmap::assign_segments(recv_set_size, recv_values, recv_vals_candidate_r,
+                          recv_vals_candidate_skr, dimension, delta,
+                          side_length, recv_sk);
+    std::stack<Rist25519_number> send_vals_candidate_r;
+    std::stack<Rist25519_number> send_vals_candidate_skr;
+    std::vector<std::vector<Rist25519_number>> send_values;
+    fmap::assign_segments(send_set_size, send_values, send_vals_candidate_r,
+                          send_vals_candidate_skr, dimension, delta,
+                          side_length, send_sk);
+    std::vector<Rist25519_number> recv_masks;
+    std::vector<Rist25519_number> recv_masks_inv;
+    fmap::get_mask_cipher(recv_set_size, recv_masks, recv_masks_inv, recv_pk);
+    std::vector<Rist25519_number> send_masks;
+    std::vector<Rist25519_number> send_masks_inv;
+    fmap::get_mask_cipher(send_set_size, send_masks, send_masks_inv, send_pk);
 
     auto sockets = coproto::LocalAsyncSocket::makePair();
 
     std::vector<Rist25519_point> recv_vec_dhkk_seedsum(recv_set_size);
     std::vector<Rist25519_point> send_vec_dhkk_seedsum(send_set_size);
 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    // online
+    // ///////////////////////////////////////////////////////////////////////////////////
+    tVar online_time;
     tStart(online_time);
     // std::cout << "fmap online begin" << std::endl;
     std::thread thread_fmap_recv(
@@ -611,23 +590,6 @@ bool test_fmap(const CLP &cmd) {
     auto fmap_online_time = tEnd(online_time);
 
     // std::cout << "fmap online done" << std::endl;
-
-    tStart(online_time);
-
-    std::thread thread_fmat_recv(fm_paillier::fmat_paillier_recv_online,
-                                 &sockets[0], &receiver_elements,
-                                 &recv_vec_dhkk_seedsum, &fmat_vals, dimension,
-                                 delta, p, paillier_key, recv_dh_k);
-
-    std::thread thread_fmat_send(
-        fm_paillier::fmat_paillier_send_online, &sockets[1], &sender_elements,
-        &send_vec_dhkk_seedsum, &send_prefixes_k_net, &vec_mask_ct, dimension,
-        delta, p, paillier_key.pub_key, send_dh_k);
-
-    thread_fmat_recv.join();
-    thread_fmat_send.join();
-
-    double fmat_online_time = tEnd(online_time);
 
     ipcl::setHybridOff();
     ipcl::terminateContext();
