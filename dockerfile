@@ -3,6 +3,7 @@ FROM ubuntu:22.04
 # Install dependencies
 RUN apt-get update && \
     apt-get install -y \
+    vim \
     git \
     python3 \
     python3-pip \
@@ -28,15 +29,10 @@ RUN add-apt-repository ppa:ubuntu-toolchain-r/test -y && \
     update-alternatives --set gcc /usr/bin/gcc-13 && \
     update-alternatives --set g++ /usr/bin/g++-13
 
+
 WORKDIR /app
 
-RUN git clone https://github.com/intel/pailliercryptolib.git && \
-    git clone https://github.com/osu-crypto/libOTe.git
-
-WORKDIR /app/libOTe
-
-RUN python3 build.py --all --boost --sodium && \
-    python3 build.py --install=/app/out/install
+RUN git clone https://github.com/intel/pailliercryptolib.git
 
 WORKDIR /app/pailliercryptolib
 
@@ -44,6 +40,13 @@ RUN cmake -S . -B build -DCMAKE_INSTALL_PREFIX=/app/out/install -DCMAKE_BUILD_TY
     cmake --build build -j && \
     cmake --build build --target install -j
 
+WORKDIR /app
+RUN git clone https://github.com/osu-crypto/libOTe.git 
+
+WORKDIR /app/libOTe
+RUN git checkout a403ec37c6a32148648b7d8fd66dc35318d9f99d && \
+    python3 build.py --all --boost --sodium && \
+    python3 build.py --install=/app/out/install
 
 WORKDIR /app
 
