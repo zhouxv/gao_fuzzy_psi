@@ -10,5 +10,5 @@ tcset lo --rate 100Mbps --delay 80ms --overwrite
 ```
 
 ```
-nohup ./shell_run_bench_fmap.sh > log 2>&1 &
+nohup ./shell_run_bench_fmap.sh > gao_fmap.log 2>&1 &
 ```
