@@ -564,7 +564,18 @@ bool test_fmap(const CLP &cmd) {
 
     tStart(fmap_timer);
     if (fake) {
+      fmap::assign_segments_fake(recv_set_size, recv_values,
+                                 recv_vals_candidate_r, recv_vals_candidate_skr,
+                                 dimension, delta, side_length, recv_sk);
+      fmap::assign_segments_fake(send_set_size, send_values,
+                                 send_vals_candidate_r, send_vals_candidate_skr,
+                                 dimension, delta, side_length, send_sk);
 
+      fmap::get_mask_cipher_fake(recv_set_size, recv_masks, recv_masks_inv,
+                                 recv_pk);
+
+      fmap::get_mask_cipher_fake(send_set_size, send_masks, send_masks_inv,
+                                 send_pk);
     } else {
       fmap::assign_segments(recv_set_size, recv_values, recv_vals_candidate_r,
                             recv_vals_candidate_skr, dimension, delta,
