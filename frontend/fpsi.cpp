@@ -469,6 +469,7 @@ bool test_fmap(const CLP &cmd) {
   const u64 send_set_size = 1ull << cmd.getOr("s", 8);
   const u64 intersection_size = cmd.getOr("i", 10);
   const u64 trait = cmd.getOr("trait", 10);
+  const bool fake = cmd.isSet("fake");
   if ((intersection_size > recv_set_size) |
       (intersection_size > send_set_size)) {
     // printf("intersection_size should not be greater than set_size\n");
@@ -544,29 +545,38 @@ bool test_fmap(const CLP &cmd) {
     // offline
     // ///////////////////////////////////////////////////////////////////////////////////
 
-    std::stack<Rist25519_number> recv_vals_candidate_r;
-    std::stack<Rist25519_number> recv_vals_candidate_skr;
+    std::vector<std::vector<Rist25519_number>> send_values;
     std::vector<std::vector<Rist25519_number>> recv_values;
-    fmap::assign_segments(recv_set_size, recv_values, recv_vals_candidate_r,
-                          recv_vals_candidate_skr, dimension, delta,
-                          side_length, recv_sk);
+
     std::stack<Rist25519_number> send_vals_candidate_r;
     std::stack<Rist25519_number> send_vals_candidate_skr;
-    std::vector<std::vector<Rist25519_number>> send_values;
-    fmap::assign_segments(send_set_size, send_values, send_vals_candidate_r,
-                          send_vals_candidate_skr, dimension, delta,
-                          side_length, send_sk);
+    std::stack<Rist25519_number> recv_vals_candidate_r;
+    std::stack<Rist25519_number> recv_vals_candidate_skr;
+
     std::vector<Rist25519_number> recv_masks;
     std::vector<Rist25519_number> recv_masks_inv;
-    fmap::get_mask_cipher(recv_set_size, recv_masks, recv_masks_inv, recv_pk);
     std::vector<Rist25519_number> send_masks;
     std::vector<Rist25519_number> send_masks_inv;
-    fmap::get_mask_cipher(send_set_size, send_masks, send_masks_inv, send_pk);
-
-    auto sockets = coproto::LocalAsyncSocket::makePair();
 
     std::vector<Rist25519_point> recv_vec_dhkk_seedsum(recv_set_size);
     std::vector<Rist25519_point> send_vec_dhkk_seedsum(send_set_size);
+
+    if (fake) {
+
+    } else {
+      fmap::assign_segments(recv_set_size, recv_values, recv_vals_candidate_r,
+                            recv_vals_candidate_skr, dimension, delta,
+                            side_length, recv_sk);
+      fmap::assign_segments(send_set_size, send_values, send_vals_candidate_r,
+                            send_vals_candidate_skr, dimension, delta,
+                            side_length, send_sk);
+
+      fmap::get_mask_cipher(recv_set_size, recv_masks, recv_masks_inv, recv_pk);
+
+      fmap::get_mask_cipher(send_set_size, send_masks, send_masks_inv, send_pk);
+    }
+
+    auto sockets = coproto::LocalAsyncSocket::makePair();
 
     ///////////////////////////////////////////////////////////////////////////////////////
     // online
