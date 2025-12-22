@@ -539,8 +539,9 @@ bool test_fmap(const CLP &cmd) {
 
   // ///////////////////////////////////////
 
-  std::vector<double> times(trait), comus(trait);
+  std::vector<double> times(trait), comus(trait), offline_times(trait);
   for (u64 i = 0; i < trait; i++) {
+    tVar fmap_timer;
     ///////////////////////////////////////////////////////////////////////////////////////
     // offline
     // ///////////////////////////////////////////////////////////////////////////////////
@@ -561,6 +562,7 @@ bool test_fmap(const CLP &cmd) {
     std::vector<Rist25519_point> recv_vec_dhkk_seedsum(recv_set_size);
     std::vector<Rist25519_point> send_vec_dhkk_seedsum(send_set_size);
 
+    tStart(fmap_timer);
     if (fake) {
 
     } else {
@@ -577,12 +579,13 @@ bool test_fmap(const CLP &cmd) {
     }
 
     auto sockets = coproto::LocalAsyncSocket::makePair();
+    auto fmap_offline_time = tEnd(fmap_timer);
 
     ///////////////////////////////////////////////////////////////////////////////////////
     // online
     // ///////////////////////////////////////////////////////////////////////////////////
-    tVar online_time;
-    tStart(online_time);
+
+    tStart(fmap_timer);
     // std::cout << "fmap online begin" << std::endl;
     std::thread thread_fmap_recv(
         fmap::fmap_recv_online, &sockets[0], &receiver_elements, &recv_values,
@@ -597,7 +600,7 @@ bool test_fmap(const CLP &cmd) {
 
     thread_fmap_recv.join();
     thread_fmap_send.join();
-    auto fmap_online_time = tEnd(online_time);
+    auto fmap_online_time = tEnd(fmap_timer);
 
     // std::cout << "fmap online done" << std::endl;
 
@@ -608,17 +611,20 @@ bool test_fmap(const CLP &cmd) {
     auto send_bytes_present = sockets[1].bytesSent();
 
     times[i] = fmap_online_time;
+    offline_times[i] = fmap_offline_time;
     comus[i] = ((recv_bytes_present) + (send_bytes_present)) / 1024.0 / 1024.0;
   }
 
   auto avg_time = std::accumulate(times.begin(), times.end(), 0.0) / trait;
+  auto avg_offline_time =
+      std::accumulate(offline_times.begin(), offline_times.end(), 0.0) / trait;
   auto avg_com = std::accumulate(comus.begin(), comus.end(), 0.0) / trait;
 
   std::cout << std::format(
                    "[gao fmap]    𝐿{}    {:^5}  {:^5}  {:^5}  {:^10.3f} "
-                   "{:^10.3f}",
+                   "{:^10.3f} {:^10.3f}",
                    p, dimension, delta, recv_set_size, avg_com,
-                   avg_time / 1000.0)
+                   avg_time / 1000.0, avg_offline_time / 1000.0)
             << std::endl;
 
   return 1;
