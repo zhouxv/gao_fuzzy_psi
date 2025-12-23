@@ -1573,6 +1573,9 @@ void RBOKVS_rist::init(const u64 &n, const double &epsilon,
     // n = 2^18, \lambda = 0.08192w - 8.569
     // n = 2^20, \lambda = 0.08313w - 10.880
     // n = 2^24, \lambda = 0.08253w - 14.671
+    // n = 2^26, \lambda = 0.08253w - 16.570 (new)
+    // n = 2^28, \lambda = 0.08253w - 18.470 (new)
+    // n = 2^30, \lambda = 0.08253w - 20.370 (new)
     if (nn <= 10) {
       width_band = std::min<u64>(
           static_cast<u64>((stasSecParam + 3.464) / 0.08047), num_columns);
@@ -1591,11 +1594,21 @@ void RBOKVS_rist::init(const u64 &n, const double &epsilon,
     } else if (nn <= 24) {
       width_band = std::min<u64>(
           static_cast<u64>((stasSecParam + 14.671) / 0.08253), num_columns);
+    } else if (nn <= 26) {
+      width_band = std::min<u64>(
+          static_cast<u64>((stasSecParam + 16.57) / 0.08253), num_columns);
+    } else if (nn <= 28) {
+      width_band = std::min<u64>(
+          static_cast<u64>((stasSecParam + 18.47) / 0.08253), num_columns);
+    } else if (nn <= 30) {
+      width_band = std::min<u64>(
+          static_cast<u64>((stasSecParam + 20.37) / 0.08253), num_columns);
     } else {
-      std::cout << "no proper parameter for this n, use parameters for n = 2^24"
+      std::cout << "no proper parameter for this n, use parameters for n = "
+                   "2^30 and epsilon = 0.03"
                 << std::endl;
       width_band = std::min<u64>(
-          static_cast<u64>((stasSecParam + 14.671) / 0.08253), num_columns);
+          static_cast<u64>((stasSecParam + 20.37) / 0.08253), num_columns);
     }
   } else if (std::abs(epsilon - 0.05) < 1e-5) {
     // epsilon = 0.05
@@ -1605,6 +1618,9 @@ void RBOKVS_rist::init(const u64 &n, const double &epsilon,
     // n = 2^18, \lambda = 0.1388w - 10.710
     // n = 2^20, \lambda = 0.1407w - 12.920
     // n = 2^24, \lambda = 0.1376w - 16.741
+    // n = 2^26, \lambda = 0.1376w - 18.650 (new)
+    // n = 2^28, \lambda = 0.1376w - 20.560 (new)
+    // n = 2^30, \lambda = 0.1376w - 22.470 (new)
     if (nn <= 10) {
       width_band = std::min<u64>(
           static_cast<u64>((stasSecParam + 4.424) / 0.1388), num_columns);
@@ -1623,10 +1639,21 @@ void RBOKVS_rist::init(const u64 &n, const double &epsilon,
     } else if (nn <= 24) {
       width_band = std::min<u64>(
           static_cast<u64>((stasSecParam + 16.741) / 0.1376), num_columns);
-    } else {
-      std::cout << "no proper parameter for this n, use n = 2^24" << std::endl;
+    } else if (nn <= 26) {
       width_band = std::min<u64>(
-          static_cast<u64>((stasSecParam + 16.741) / 0.1376), num_columns);
+          static_cast<u64>((stasSecParam + 18.65) / 0.1376), num_columns);
+    } else if (nn <= 28) {
+      width_band = std::min<u64>(
+          static_cast<u64>((stasSecParam + 20.56) / 0.1376), num_columns);
+    } else if (nn <= 30) {
+      width_band = std::min<u64>(
+          static_cast<u64>((stasSecParam + 22.47) / 0.1376), num_columns);
+    } else {
+      std::cout << "no proper parameter for this n, use n = 2^30 and "
+                   "epsilon = 0.05"
+                << std::endl;
+      width_band = std::min<u64>(
+          static_cast<u64>((stasSecParam + 22.47) / 0.1376), num_columns);
     }
   } else if (std::abs(epsilon - 0.07) < 1e-5) {
     // epsilon = 0.07
@@ -1635,6 +1662,11 @@ void RBOKVS_rist::init(const u64 &n, const double &epsilon,
     // n = 2^16, \lambda = 0.1961w - 10.430
     // n = 2^18, \lambda = 0.1955w - 12.300
     // n = 2^20, \lambda = 0.1939w - 14.100
+    // n = 2^22, \lambda = 0.1939w - 15.930 (new)
+    // n = 2^24, \lambda = 0.1939w - 17.760 (new)
+    // n = 2^26, \lambda = 0.1939w - 19.590 (new)
+    // n = 2^28, \lambda = 0.1939w - 21.420 (new)
+    // n = 2^30, \lambda = 0.1939w - 23.250 (new)
     if (nn <= 10) {
       width_band = std::min<u64>(
           static_cast<u64>((stasSecParam + 5.383) / 0.1947), num_columns);
@@ -1650,10 +1682,27 @@ void RBOKVS_rist::init(const u64 &n, const double &epsilon,
     } else if (nn <= 20) {
       width_band = std::min<u64>(
           static_cast<u64>((stasSecParam + 14.100) / 0.1939), num_columns);
-    } else {
-      std::cout << "no proper parameter for this n, use n = 2^20" << std::endl;
+    } else if (nn <= 22) {
       width_band = std::min<u64>(
-          static_cast<u64>((stasSecParam + 14.100) / 0.1939), num_columns);
+          static_cast<u64>((stasSecParam + 15.93) / 0.1939), num_columns);
+    } else if (nn <= 24) {
+      width_band = std::min<u64>(
+          static_cast<u64>((stasSecParam + 17.76) / 0.1939), num_columns);
+    } else if (nn <= 26) {
+      width_band = std::min<u64>(
+          static_cast<u64>((stasSecParam + 19.59) / 0.1939), num_columns);
+    } else if (nn <= 28) {
+      width_band = std::min<u64>(
+          static_cast<u64>((stasSecParam + 21.42) / 0.1939), num_columns);
+    } else if (nn <= 30) {
+      width_band = std::min<u64>(
+          static_cast<u64>((stasSecParam + 23.25) / 0.1939), num_columns);
+    } else {
+      std::cout
+          << "no proper parameter for this n, use n = 2^30 and epsilon = 0.07"
+          << std::endl;
+      width_band = std::min<u64>(
+          static_cast<u64>((stasSecParam + 23.25) / 0.1939), num_columns);
     }
   } else if (std::abs(epsilon - 0.1) < 1e-5) {
     // epsilon = 0.1
@@ -1663,6 +1712,9 @@ void RBOKVS_rist::init(const u64 &n, const double &epsilon,
     // n = 2^18, \lambda = 0.2715w - 13.390
     // n = 2^20, \lambda = 0.2691w - 15.210
     // n = 2^24, \lambda = 0.2751w - 19.830
+    // n = 2^26, \lambda = 0.2730w - 21.450 (new)
+    // n = 2^28, \lambda = 0.2725w - 23.100 (new)
+    // n = 2^30, \lambda = 0.2720w - 25.750 (new)
     if (nn <= 10) {
       width_band = std::min<u64>(
           static_cast<u64>((stasSecParam + 6.296) / 0.2747), num_columns);
@@ -1681,11 +1733,23 @@ void RBOKVS_rist::init(const u64 &n, const double &epsilon,
     } else if (nn <= 24) {
       width_band = std::min<u64>(
           static_cast<u64>((stasSecParam + 19.830) / 0.2751), num_columns);
-    } else {
-      std::cout << "no proper parameter for this n, use n = 2^24" << std::endl;
+    } else if (nn <= 26) {
       width_band = std::min<u64>(
-          static_cast<u64>((stasSecParam + 19.830) / 0.2751), num_columns);
+          static_cast<u64>((stasSecParam + 21.450) / 0.2730), num_columns);
+    } else if (nn <= 28) {
+      width_band = std::min<u64>(
+          static_cast<u64>((stasSecParam + 23.100) / 0.2725), num_columns);
+    } else if (nn <= 30) {
+      width_band = std::min<u64>(
+          static_cast<u64>((stasSecParam + 25.750) / 0.272), num_columns);
+    } else {
+      std::cout
+          << "no proper parameter for this n, use n = 2^30 and epsilon = 0.1"
+          << std::endl;
+      width_band = std::min<u64>(
+          static_cast<u64>((stasSecParam + 25.750) / 0.272), num_columns);
     }
+
   } else {
     throw std::runtime_error("no proper parameter for this epsilon");
   }
