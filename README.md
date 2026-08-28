@@ -23,6 +23,15 @@ sudo apt install libgmp-dev
 # install libOTe
 git clone https://github.com/osu-crypto/libOTe.git
 cd libOTe
+git checkout a403ec37c6a32148648b7d8fd66dc35318d9f99d
+
+# Download boost 1.86.0, because the automatic download source of the library is too slow
+mkdir -p out && cd out
+curl -fL --retry 3 \
+-o boost_1_86_0.tar.bz2 \
+'https://sourceforge.net/projects/boost/files/boost/1.86.0/boost_1_86_0.tar.bz2/download'
+cd ..
+
 python3 build.py --all --boost --sodium
 python3 build.py --install=../install/
 cd ..
@@ -35,9 +44,9 @@ sudo apt-get install libssl-dev
 git clone https://github.com/intel/pailliercryptolib.git
 cd pailliercryptolib/
 export IPCL_ROOT=$(pwd)
-sudo cmake -S . -B build -DCMAKE_INSTALL_PREFIX=../install/ -DCMAKE_BUILD_TYPE=Release -DIPCL_TEST=OFF -DIPCL_BENCHMARK=OFF
-sudo cmake --build build -j
-sudo cmake --build build --target install -j
+cmake -S . -B build -DCMAKE_INSTALL_PREFIX=../install/ -DCMAKE_BUILD_TYPE=Release -DIPCL_TEST=OFF -DIPCL_BENCHMARK=OFF
+cmake --build build -j
+cmake --build build --target install -j
 cd ..
 
 ```
@@ -110,3 +119,20 @@ Run our FPSI for Hamming distance in a 128-dimensional space with threshold of 5
 # run FPSI 
 ./main -fpsi -t13 -hamdelta 5 -hams 6 -hamr 6 -hami 6
 ```
+
+## run docker
+
+```bash
+sudo docker build -t gao_artifact .
+sudo docker run -dit --name gao_artifact --cap-add=NET_ADMIN gao_artifact:latest
+
+# docker tag gao_artifact:latest blueobsidian/gao_artifact:latest
+# docker push blueobsidian/gao_artifact:latest
+```
+
+```
+tcset lo --rate 100Mbps --delay 80ms --overwrite
+```
+
+```
+nohup ./shell_run_bench_fmap.sh > gao_fmap.log 2>&1 &

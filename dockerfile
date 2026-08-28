@@ -64,5 +64,5 @@ COPY ./shell_run_bench_fmap.sh ./
 RUN chmod +x ./*.sh && \
     mkdir build && \
     cd build && \
-    cmake .. && \
+    cmake .. -DCMAKE_BUILD_TYPE=Release && \
     make -j 
